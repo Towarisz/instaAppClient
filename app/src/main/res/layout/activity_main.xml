@@ -1,18 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:background="@drawable/login_background_selector">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:paddingTop="70dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:gravity="center"
+        android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Insta App"
+            android:textColor="@color/white"
+            android:textSize="50dp"
+            android:gravity="center"
+            android:layout_marginTop="100dp" />
+
+        <EditText
+            android:layout_marginTop="120dp"
+            android:textColor="@color/white"
+            android:id="@+id/editTextTextEmailAddress"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:textColorHint="@color/white"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:textColor="@color/white"
+            android:id="@+id/editTextTextPassword"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+
+            android:textColorHint="@color/white"
+            android:inputType="textPassword" />
+
+        <Button
+            android:layout_marginTop="5dp"
+            android:backgroundTint="@color/white"
+            android:textColor="#FFddc1d7"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="Login" />
+
+        <TextView
+            android:layout_marginTop="5dp"
+            android:textColor="@color/white"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="Create Account" />
+    </LinearLayout>
+
+</LinearLayout>
