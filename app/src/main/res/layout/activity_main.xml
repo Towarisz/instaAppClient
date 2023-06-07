@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".LoginScreen"
     android:orientation="vertical"
     android:gravity="center"
     android:background="@drawable/login_background_selector">
@@ -50,7 +50,8 @@
             android:textColor="#FFddc1d7"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:text="Login" />
+            android:text="Login"
+            android:id="@+id/loginBtn"/>
 
         <LinearLayout
             android:layout_width="300dp"
@@ -62,6 +63,8 @@
                 android:textColor="@color/white"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Create Account" />
+                android:text="Create Account"
+                android:id="@+id/createAccountBtn"
+                />
         </LinearLayout>
 </LinearLayout>
