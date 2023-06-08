@@ -1,10 +1,15 @@
 package api;
 
+import java.util.List;
+
+import api.model.PhotoModel;
 import api.model.PostMessage;
+import api.model.ProfileModel;
 import api.model.UserLogin;
 import api.model.UserRegister;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
@@ -34,7 +39,7 @@ public interface ApiInterface {
     @GET("/api/tags/{id}")
     Call<PostMessage> getTag(@Path("id") int postId);
 
-    //PROFILE
+    // PROFILE
 
     @PATCH("/api/profile")
     Call<PostMessage> changeName(String name,String lastname);
@@ -44,4 +49,21 @@ public interface ApiInterface {
 
     @POST("/api/profile")
     Call<PostMessage> Profile();
+
+    // PHOTOS
+
+    @PATCH("/api/photos")
+    Call<PostMessage> addTags();// TODO dodac potrzebne parametry, dodac klase do response
+
+    @DELETE("/api/photos/{id}")
+    Call<PostMessage> getProfile(@Path("id") int photoId);
+
+    @POST("/api/photos")
+    Call<PostMessage> sendPhoto();// TODO dodac potrzebne parametry, dodac klase do response
+
+    @GET("/api/photos")
+    Call<List<PhotoModel>> getAllPhotos();
+
+    @GET("/api/profile/{id}")
+    Call<ProfileModel> getProfileByID(@Path("id") long author);
 }
