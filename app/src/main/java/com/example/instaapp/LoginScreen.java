@@ -2,13 +2,17 @@ package com.example.instaapp;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.transition.Explode;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +22,7 @@ import android.widget.Toast;
 import com.example.instaapp.databinding.ActivityMainBinding;
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.io.IOException;
 
 import api.ApiInterface;
@@ -31,9 +36,34 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginScreen extends AppCompatActivity {
     private ActivityMainBinding activityMainBinding;
+    private String[] REQUIRED_PERMISSIONS = new String[]{
+            "android.permission.CAMERA",
+            "android.permission.RECORD_AUDIO",
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+            "android.permission.READ_EXTERNAL_STORAGE"};
+
+    private int PERMISSIONS_REQUEST_CODE = 100;
+
+    private boolean checkIfPermissionsGranted() {
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!checkIfPermissionsGranted()) {
+            requestPermissions(REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
+        }
+
+        File pic = Environment.getExternalStoragePublicDirectory( Environment.DIRECTORY_PICTURES );
+        File dir = new File(pic, "InstaAppStoch");
+        dir.mkdir();
 
         getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
         getWindow().setExitTransition(new Explode());
@@ -42,8 +72,7 @@ public class LoginScreen extends AppCompatActivity {
         View view = activityMainBinding.getRoot();
         setContentView(view);
 
-        SharedPreferences sharedPref = activityMainBinding.getRoot().getContext().getSharedPreferences(
-                "token", activityMainBinding.getRoot().getContext().MODE_PRIVATE);
+        SharedPreferences settings = getSharedPreferences("loginSettings", Context.MODE_PRIVATE);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://192.168.2.122:3000")
@@ -51,7 +80,6 @@ public class LoginScreen extends AppCompatActivity {
                 .build();
         ApiInterface Api = retrofit.create(ApiInterface.class);
 
-        // zmiana activity po kliknieciu na registerscreen
         activityMainBinding.createAccountBtn.setOnClickListener((view1)->{
             Intent intent = new Intent(LoginScreen.this, RegisterScreen.class);
             startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
@@ -108,7 +136,7 @@ public class LoginScreen extends AppCompatActivity {
                             return;
 
                         }else{
-                            SharedPreferences.Editor editor = sharedPref.edit();
+                            SharedPreferences.Editor editor = settings.edit();
                             editor.putString("token", response.body().getMessage());
                             editor.apply();
                             Intent intent = new Intent(LoginScreen.this, MainPage.class);
