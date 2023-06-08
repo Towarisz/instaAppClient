@@ -193,9 +193,14 @@ public class MainPage extends AppCompatActivity {
             call.enqueue(new Callback<PhotoModel>() {
                 @Override
                 public void onResponse(Call<PhotoModel> call, Response<PhotoModel> response) {
-                    if(response.code() == 200 && response.body().url.indexOf("mp4") == -1){
+                    if(response.code() == 200){
                         Intent intent = new Intent(getApplicationContext(),PhotoEditionActivity.class);
                         intent.putExtra("photoId",response.body().id);
+                        if(response.body().url.indexOf("mp4") == -1){
+                            intent.putExtra("video",false);
+                        }else{
+                            intent.putExtra("video",true);
+                        }
                         overridePendingTransition(0, 0);
                         finish();
                         overridePendingTransition(0, 0);

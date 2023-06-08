@@ -110,7 +110,6 @@ public class LoginScreen extends AppCompatActivity {
                                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int which) {
                                                 startActivity(intent);
-                                                finish();
                                             }
                                         })
                                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {

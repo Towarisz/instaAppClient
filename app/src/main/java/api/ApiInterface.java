@@ -10,6 +10,8 @@ import api.model.FilterModel;
 import api.model.PhotoModel;
 import api.model.PostMessage;
 import api.model.ProfileModel;
+import api.model.TagModel;
+import api.model.TagResponseModel;
 import api.model.UserLogin;
 import api.model.UserRegister;
 import okhttp3.MultipartBody;
@@ -41,7 +43,7 @@ public interface ApiInterface {
     Call<PostMessage> createTag(String name);
 
     @GET("/api/tags")
-    Call<PostMessage> getAllTags();
+    Call<List<TagModel>> getAllTags();
 
     @GET("/api/tags/raw")
     Call<PostMessage> getAllTagsRaw();
@@ -62,15 +64,15 @@ public interface ApiInterface {
 
     // PHOTOS
 
-    @PATCH("/api/photos")
-    Call<PostMessage> addTags();// TODO dodac potrzebne parametry, dodac klase do response
+    @PATCH("/api/photos/tags")
+    Call<PhotoModel> addTags(@Header("Authorization") String token,@Body TagResponseModel body);
 
     @DELETE("/api/photos/{id}")
     Call<PostMessage> getProfile(@Path("id") int photoId);
 
     @Multipart
     @POST("/api/photos")
-    Call<PhotoModel> sendPhoto(@Header("Authorization") String token,@Part MultipartBody.Part body);// TODO dodac potrzebne parametry, dodac klase do response
+    Call<PhotoModel> sendPhoto(@Header("Authorization") String token,@Part MultipartBody.Part body);
 
     @GET("/api/photos")
     Call<List<PhotoModel>> getAllPhotos();
