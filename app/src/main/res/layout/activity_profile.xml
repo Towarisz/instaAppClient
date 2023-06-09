@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Profile"
+    android:weightSum="3"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:weightSum="10">
+
+        <ImageView
+            android:layout_weight="4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/profilePicture"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:cropToPadding="true"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="6"
+            android:orientation="vertical"
+            android:weightSum="3">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:weightSum="2">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"/>
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:src="@drawable/round_settings_24"
+                    android:layout_weight="1"
+                    android:id="@+id/profileSettings"/>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/profileName"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textSize="30dp"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+        <GridView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/Images"
+            android:numColumns="auto_fit"
+            tools:listitem="@layout/image_on_profile"
+            />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:weightSum="3">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/round_home_24"
+            android:id="@+id/homePage"/>
+
+        <ImageView
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/sharp_add_24"
+            android:id="@+id/createPost"/>
+        <ImageView
+            android:layout_weight="1"
+            android:id="@+id/profile"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/baseline_person_24"/>
+    </LinearLayout>
+
+</LinearLayout>

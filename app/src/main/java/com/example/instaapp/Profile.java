@@ -1,9 +1,5 @@
 package com.example.instaapp;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,7 +14,14 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 
-import com.example.instaapp.databinding.ActivityMainPageBinding;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+
+import com.example.instaapp.databinding.ActivityProfileBinding;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -29,6 +32,8 @@ import java.util.List;
 
 import api.ApiInterface;
 import api.model.PhotoModel;
+import api.model.ProfileModel;
+import api.model.UserProfile;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -38,32 +43,29 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainPage extends AppCompatActivity {
-    private ActivityMainPageBinding activityMainPageBinding;
-    private List<PhotoModel> photos;
+public class Profile extends AppCompatActivity {
+    private ActivityProfileBinding activityProfileBinding;
+    private List<Long> photos;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityMainPageBinding = ActivityMainPageBinding.inflate(getLayoutInflater());
-        View view = activityMainPageBinding.getRoot();
+        activityProfileBinding = ActivityProfileBinding.inflate(getLayoutInflater());
+        View view = activityProfileBinding.getRoot();
+
         setContentView(view);
 
-        activityMainPageBinding.homePage.setOnClickListener((view1)->{
-            finish();
-            overridePendingTransition(0, 0);
-            startActivity(getIntent());
-            overridePendingTransition(0, 0);
-        });
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://192.168.2.122:3000")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         ApiInterface Api = retrofit.create(ApiInterface.class);
-        Call<List<PhotoModel>> call = Api.getAllPhotos();
-        call.enqueue(new Callback<List<PhotoModel>>() {
+        SharedPreferences settings = getSharedPreferences("loginSettings", Context.MODE_PRIVATE);
+        String token = "Bearer "+settings.getString("token",null);
+        Call<UserProfile> call = Api.getProfile(token);
+        call.enqueue(new Callback<UserProfile>() {
             @Override
-            public void onResponse(Call<List<PhotoModel>> call, Response<List<PhotoModel>> response) {
+            public void onResponse(Call<UserProfile> call, Response<UserProfile> response) {
                 if(response.code()!= 200){
                     try {
                         Log.d("XXX", response.errorBody().string());
@@ -71,19 +73,35 @@ public class MainPage extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }else{
-                    photos = new ArrayList<>(response.body());
-                    PostArrayAdapter adapter = new PostArrayAdapter(activityMainPageBinding.getRoot().getContext(), photos);
-                    activityMainPageBinding.postList.setAdapter(adapter);
+                    activityProfileBinding.profileName.setText(response.body().name + "\n" + response.body().lastName);
+                    Picasso.get().load("http://192.168.2.122:3000/api/profile/pic/"+response.body().id).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).placeholder(R.drawable.baseline_person_24).error(R.drawable.baseline_person_24).into(activityProfileBinding.profilePicture);
+                    photos = new ArrayList<Long>(response.body().photos);
+                    PostProfileAdapter adapter = new PostProfileAdapter(activityProfileBinding.getRoot().getContext(), photos);
+                    activityProfileBinding.Images.setAdapter(adapter);
                 }
             }
 
             @Override
-            public void onFailure(Call<List<PhotoModel>> call, Throwable t) {
+            public void onFailure(Call<UserProfile> call, Throwable t) {
 
             }
         });
-        activityMainPageBinding.createPost.setOnClickListener(view1 -> {
-            AlertDialog.Builder alert = new AlertDialog.Builder(MainPage.this);
+
+        activityProfileBinding.homePage.setOnClickListener((view1)->{
+            finish();
+            overridePendingTransition(0, 0);
+            startActivity(new Intent(getApplicationContext(),MainPage.class));
+            overridePendingTransition(0, 0);
+        });
+        activityProfileBinding.profile.setOnClickListener((view1)->{
+            finish();
+            overridePendingTransition(0, 0);
+            startActivity(getIntent());
+            overridePendingTransition(0, 0);
+        });
+
+        activityProfileBinding.createPost.setOnClickListener(view1 -> {
+            AlertDialog.Builder alert = new AlertDialog.Builder(Profile.this);
             alert.setTitle("Choose from ");
             alert.setMessage("Select your method of sending photo");
             alert.setPositiveButton("Camera", new AlertDialog.OnClickListener() {
@@ -108,15 +126,11 @@ public class MainPage extends AppCompatActivity {
             alert.show();
 
         });
-
-        activityMainPageBinding.profile.setOnClickListener(view1 -> {
-            Intent intent = new Intent(getApplicationContext(), Profile.class);
-            finish();
-            startActivity(intent);
+        activityProfileBinding.profileSettings.setOnClickListener(view1 -> {
+          //TODO napisac dropdown menu
         });
 
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -183,7 +197,7 @@ public class MainPage extends AppCompatActivity {
             Uri imgData = data.getData();
 
 
-            File file = new File(getRealPathFromURI(imgData, MainPage.this));
+            File file = new File(getRealPathFromURI(imgData, Profile.this));
 
             RequestBody fileRequest = RequestBody.create(MediaType.parse("multipart/form-data"), file);
             MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), fileRequest);

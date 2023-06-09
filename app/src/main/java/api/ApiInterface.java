@@ -13,6 +13,7 @@ import api.model.ProfileModel;
 import api.model.TagModel;
 import api.model.TagResponseModel;
 import api.model.UserLogin;
+import api.model.UserProfile;
 import api.model.UserRegister;
 import okhttp3.MultipartBody;
 import retrofit2.Call;
@@ -57,7 +58,7 @@ public interface ApiInterface {
     Call<PostMessage> changeName(String name,String lastname);
 
     @GET("/api/profile")
-    Call<PostMessage> getProfile();
+    Call<UserProfile> getProfile(@Header("Authorization") String token);
 
     @POST("/api/profile")
     Call<PostMessage> Profile();
@@ -68,7 +69,7 @@ public interface ApiInterface {
     Call<PhotoModel> addTags(@Header("Authorization") String token,@Body TagResponseModel body);
 
     @DELETE("/api/photos/{id}")
-    Call<PostMessage> getProfile(@Path("id") int photoId);
+    Call<PostMessage> deletePhoto(@Path("id") int photoId);
 
     @Multipart
     @POST("/api/photos")
@@ -76,6 +77,9 @@ public interface ApiInterface {
 
     @GET("/api/photos")
     Call<List<PhotoModel>> getAllPhotos();
+
+    @GET("/api/photos/{id}")
+    Call<PhotoModel> getPhotoById(@Path("id")long id);
 
     @GET("/api/profile/{id}")
     Call<ProfileModel> getProfileByID(@Path("id") long author);

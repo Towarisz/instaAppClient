@@ -9,7 +9,10 @@
         <ImageView
             android:id="@+id/profilePicture"
             android:layout_width="50dp"
-            android:layout_height="50dp"/>
+            android:layout_height="50dp"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:cropToPadding="true"/>
         <TextView
             android:id="@+id/profileName"
             android:layout_width="match_parent"
@@ -20,6 +23,9 @@
         android:id="@+id/Photo"
         android:layout_width="match_parent"
         android:layout_height="300dp"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:cropToPadding="true"
         android:layout_margin="20dp"
         />
     <androidx.media3.ui.PlayerView
