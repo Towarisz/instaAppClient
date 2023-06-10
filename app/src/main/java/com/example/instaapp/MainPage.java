@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 
 import com.example.instaapp.databinding.ActivityMainPageBinding;
 
@@ -74,6 +75,15 @@ public class MainPage extends AppCompatActivity {
                     photos = new ArrayList<>(response.body());
                     PostArrayAdapter adapter = new PostArrayAdapter(activityMainPageBinding.getRoot().getContext(), photos);
                     activityMainPageBinding.postList.setAdapter(adapter);
+                    activityMainPageBinding.postList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            PhotoModel item = (PhotoModel) adapterView.getItemAtPosition(i);
+                            Intent intent = new Intent(getApplicationContext(),SinglePhotoPreview.class);
+                            intent.putExtra("id",item.id);
+                            startActivity(intent);
+                        }
+                    });
                 }
             }
 
@@ -161,11 +171,12 @@ public class MainPage extends AppCompatActivity {
                     public void onResponse(Call<PhotoModel> call, Response<PhotoModel> response) {
                         if(response.code() == 200){
                             Intent intent = new Intent(getApplicationContext(),PhotoEditionActivity.class);
+                            intent.putExtra("video",false);
                             intent.putExtra("photoId",response.body().id);
                             overridePendingTransition(0, 0);
-                            finish();
-                            overridePendingTransition(0, 0);
                             startActivity(intent);
+                            overridePendingTransition(0, 0);
+                            finish();
                         }
                     }
 

@@ -96,4 +96,5 @@ public class PostArrayAdapter extends ArrayAdapter<PhotoModel> {
 
         return convertView;
     }
+
 }

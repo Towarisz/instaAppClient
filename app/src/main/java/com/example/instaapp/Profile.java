@@ -11,8 +11,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -31,7 +35,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import api.ApiInterface;
+import api.model.Kot;
 import api.model.PhotoModel;
+import api.model.PostMessage;
 import api.model.ProfileModel;
 import api.model.UserProfile;
 import okhttp3.MediaType;
@@ -78,6 +84,15 @@ public class Profile extends AppCompatActivity {
                     photos = new ArrayList<Long>(response.body().photos);
                     PostProfileAdapter adapter = new PostProfileAdapter(activityProfileBinding.getRoot().getContext(), photos);
                     activityProfileBinding.Images.setAdapter(adapter);
+                    activityProfileBinding.Images.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            Long item = (long) adapterView.getItemAtPosition(i);
+                            Intent intent = new Intent(getApplicationContext(),SinglePhotoPreview.class);
+                            intent.putExtra("id",item);
+                            startActivity(intent);
+                        }
+                    });
                 }
             }
 
@@ -127,7 +142,106 @@ public class Profile extends AppCompatActivity {
 
         });
         activityProfileBinding.profileSettings.setOnClickListener(view1 -> {
-          //TODO napisac dropdown menu
+            AlertDialog.Builder alert = new AlertDialog.Builder(Profile.this);
+            alert.setTitle("Settings");
+            alert.setPositiveButton("Change Photo", new AlertDialog.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(Intent.ACTION_PICK);
+                    intent.setType("*/*");
+                    startActivityForResult(intent, 300);
+                }
+            });
+
+            alert.setNegativeButton("Change Name", new AlertDialog.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(activityProfileBinding.getRoot().getContext());
+                    builder.setTitle("Name Change");
+                    
+
+                    final EditText input = new EditText(activityProfileBinding.getRoot().getContext());
+                    final EditText input2 = new EditText(activityProfileBinding.getRoot().getContext());
+                    final LinearLayout layout = new LinearLayout(activityProfileBinding.getRoot().getContext());
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    layout.setOrientation(LinearLayout.VERTICAL);
+                    input.setWidth(0);
+                    input2.setWidth(0);
+                    layout.addView(input);
+                    layout.addView(input2);
+                    builder.setView(layout);
+
+
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            final String name = input.getText().toString();
+                            final String lastname = input2.getText().toString();
+
+                            Retrofit retrofit = new Retrofit.Builder()
+                                    .baseUrl("http://192.168.2.122:3000")
+                                    .addConverterFactory(GsonConverterFactory.create())
+                                    .build();
+
+                            ApiInterface Api = retrofit.create(ApiInterface.class);
+                            String token = "Bearer "+settings.getString("token",null);
+                            Call<UserProfile> call = Api.changeName(token,new Kot(name,lastname));
+                            call.enqueue(new Callback<UserProfile>() {
+                                @Override
+                                public void onResponse(Call<UserProfile> call, Response<UserProfile> response) {
+                                    finish();
+                                    startActivity(getIntent());
+                                }
+
+                                @Override
+                                public void onFailure(Call<UserProfile> call, Throwable t) {
+
+                                    Log.d("xxx", t.getMessage());
+                                }
+                            });
+
+
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+                }
+            });
+
+            alert.setNeutralButton("Logout", new AlertDialog.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl("http://192.168.2.122:3000")
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+
+                    ApiInterface Api = retrofit.create(ApiInterface.class);
+                    String token = "Bearer "+settings.getString("token",null);
+                    Call<PostMessage> call = Api.logout(token);
+                    call.enqueue(new Callback<PostMessage>() {
+                        @Override
+                        public void onResponse(Call<PostMessage> call, Response<PostMessage> response) {
+                            Intent intent = new Intent(getApplicationContext(),LoginScreen.class);
+                            finish();
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void onFailure(Call<PostMessage> call, Throwable t) {
+
+                            Log.d("xxx", t.getMessage());
+                        }
+                    });
+                }
+
+            });
+
+            alert.show();
         });
 
     }
@@ -229,6 +343,39 @@ public class Profile extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<PhotoModel> call, Throwable t) {
+                    Log.d("xxx", t.getMessage());
+                }
+            });
+        }else if(requestCode == 300){
+            SharedPreferences settings = getSharedPreferences("loginSettings", Context.MODE_PRIVATE);
+            Uri imgData = data.getData();
+
+
+            File file = new File(getRealPathFromURI(imgData, Profile.this));
+
+            RequestBody fileRequest = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), fileRequest);
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl("http://192.168.2.122:3000")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            ApiInterface Api = retrofit.create(ApiInterface.class);
+            String token = "Bearer "+settings.getString("token",null);
+            Call<ProfileModel> call = Api.setProfilePhoto(token,body);
+            call.enqueue(new Callback<ProfileModel>() {
+                @Override
+                public void onResponse(Call<ProfileModel> call, Response<ProfileModel> response) {
+                    if(response.code() == 200){
+                        overridePendingTransition(0, 0);
+                        finish();
+                        overridePendingTransition(0, 0);
+                        startActivity(getIntent());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ProfileModel> call, Throwable t) {
                     Log.d("xxx", t.getMessage());
                 }
             });

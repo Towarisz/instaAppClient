@@ -145,7 +145,6 @@ public class PhotoEditionActivity extends AppCompatActivity {
                         Intent intent = new Intent(getApplicationContext(),MainPage.class);
                         finish();
                         startActivity(intent);
-
                     }
                 }
 

@@ -7,6 +7,7 @@ import com.example.instaapp.R;
 import java.util.List;
 
 import api.model.FilterModel;
+import api.model.Kot;
 import api.model.PhotoModel;
 import api.model.PostMessage;
 import api.model.ProfileModel;
@@ -37,7 +38,7 @@ public interface ApiInterface {
     Call<PostMessage> login(@Body UserLogin user);
 
     @GET("/api/user/logout")
-    Call<PostMessage> logout();
+    Call<PostMessage> logout(@Header("Authorization") String token);
 
     // TAGI
     @POST("/api/tags")
@@ -50,18 +51,19 @@ public interface ApiInterface {
     Call<PostMessage> getAllTagsRaw();
 
     @GET("/api/tags/{id}")
-    Call<PostMessage> getTag(@Path("id") int postId);
+    Call<PostMessage> getTag(@Path("id") long postId);
 
     // PROFILE
 
     @PATCH("/api/profile")
-    Call<PostMessage> changeName(String name,String lastname);
+    Call<UserProfile> changeName(@Header("Authorization") String token,@Body Kot body);
 
     @GET("/api/profile")
     Call<UserProfile> getProfile(@Header("Authorization") String token);
 
+    @Multipart
     @POST("/api/profile")
-    Call<PostMessage> Profile();
+    Call<ProfileModel> setProfilePhoto(@Header("Authorization") String token,@Part MultipartBody.Part body);
 
     // PHOTOS
 
